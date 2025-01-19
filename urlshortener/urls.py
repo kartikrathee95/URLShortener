@@ -18,6 +18,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from urlshortenerapp import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", views.home, name="home"),
+    path("shorten", views.shorten_url, name="shorten_url"),
+    path("<str:short_url>/", views.visit_shortened_url, name="visit_shortened_url"),
+    path("analytics/<path:short_url>", views.analytics, name="log_access_to_url"),
 ]
