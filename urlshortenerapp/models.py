@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db import IntegrityError, models, transaction
+from django.db import models, transaction
 from django.db.models import F
 from django.utils import timezone
 
@@ -14,6 +14,7 @@ class ShortenedURL(models.Model):
     original_url = models.URLField(max_length=400)
     short_url = models.CharField(max_length=50, default="", unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    expiration_hours = models.IntegerField(default=24)
     expiration_at = models.DateTimeField(null=True, blank=True, default=None)
     visits = models.IntegerField(default=0)
     password = models.CharField(
@@ -23,11 +24,8 @@ class ShortenedURL(models.Model):
     def save(self, *args, **kwargs):
         if not self.created_at:
             self.created_at = timezone.now()
-
         if not self.expiration_at:
-            # set the default expiration at to 24 hours from now
-            self.expiration_at = self.created_at + timedelta(hours=24)
-
+            self.expiration_at = self.created_at +timedelta(hours=self.expiration_hours)
         if not self.short_url:
             self.short_url = self.generate_short_url()
         existing_url = ShortenedURL.objects.filter(short_url=self.short_url).first()
@@ -91,14 +89,9 @@ class ShortenedURL(models.Model):
             raise ValidationError("The original URL is not well-formed.")
 
     def update_visits(self):
-
-        print(
-            f"Updating visits for {self.short_url}"
-        )  # Add this line to see when it's called
-        self.refresh_from_db()
-        self.visits = F("visits") + 1
+        self.visits = F('visits') + 1
         with transaction.atomic():
-            super().save(update_fields=["visits"])
+            super().save(update_fields=['visits'])
 
     def is_expired(self):
         return timezone.now() > self.expiration_at
