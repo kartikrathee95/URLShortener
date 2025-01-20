@@ -102,7 +102,7 @@ To track the analytics of a shortened URL, send a GET request to view the visit 
 **Using `curl`**:
 
 ```bash
-curl "https://short-ly-cfl1.onrender.com/analytics/abc123/"
+curl "https://short-ly-cfl1.onrender.com/analytics/https://short-ly-cfl1.onrender.com/1004cc54/"
 ```
 ## Response
 
