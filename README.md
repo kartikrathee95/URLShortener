@@ -1,21 +1,118 @@
 # URL Shortener
 
-A simple URL shortening web application built using Django and Django REST Framework. This app allows users to shorten URLs, visit the shortened URL, and view analytics on the usage of each shortened link. Additionally, users can set a password for a shortened URL and view access logs.
+A simple URL shortening web application built using **Django** and **Django REST Framework**. This app allows users to:
+
+- Shorten URLs
+- Visit the shortened URL
+- View analytics on the usage of each shortened link
+- Set a password for a shortened URL
+- View access logs
 
 ## Features
 
-* Shorten URLs: Convert long URLs into short URLs.
-* Password protection: Set a password on shortened URLs for additional security.
-* Visit Shortened URLs: Redirect to the original URL when visiting a shortened URL.
-* Analytics: Track the number of times a shortened URL has been accessed and view access logs.
-* Error Handling: Handle invalid URLs and missing shortened URLs with appropriate error messages.
+- **Shorten URLs**: Convert long URLs into short URLs.
+- **Password Protection**: Set a password on shortened URLs for additional security.
+- **Visit Shortened URLs**: Redirect to the original URL when visiting a shortened URL.
+- **Analytics**: Track the number of times a shortened URL has been accessed.
+- **Error Handling**: Handle invalid URLs and missing shortened URLs with appropriate error messages.
 
-## Requirements
+---
 
-* Python 3.10
-* Django
-* Django REST Framework
-* SQLite (default database)
+## Deployed API
+
+The deployed version of the URL Shortener app is available at [https://short-ly-cfl1.onrender.com/swagger/](https://short-ly-cfl1.onrender.com/swagger/). You can access the following API actions:
+
+1. **Shorten URL**: Convert long URLs into short URLs.
+2. **Password Protection**: Set a password on shortened URLs for additional security.
+3. **Visit Shortened URLs**: Redirect to the original URL when visiting a shortened URL.
+4. **Analytics**: Track the number of times a shortened URL has been accessed.
+5. **Error Handling**: Handle invalid URLs and missing shortened URLs with appropriate error messages.
+
+You can test the following actions using **`curl`** or **Postman**.
+
+---
+
+## API Actions: Using Deployed API
+
+### 1. **Shorten a URL**
+
+**POST**: `/shorten/`
+
+To shorten a URL, send a POST request with the `original_url` parameter in the request body.
+
+**Using `curl`**:
+
+```bash
+curl -X POST "https://short-ly-cfl1.onrender.com/api/shorten/" -H "Content-Type: application/json" -d '{"original_url": "https://github.com/kartikrathee95/URLShortener/blob/main/README.md"}'
+```
+## Response
+
+- **original_url**: (https://github.com/kartikrathee95/URLShortener/blob/main/README.md)
+- **short_url**: (https://short-ly-cfl1.onrender.com/abc123)
+- **expiration_hours**: 30 hours from creation
+- **expiration_at**: 2025-01-21T16:20:04.562Z
+- **visits**: 0
+- **created_at**: 2025-01-20T16:20.04.562Z
+
+### 2. **Visit a Shortened URL**
+
+**GET**: `/{short_url}/`
+
+To visit a shortened URL, send a GET request to the shortened URL. Optionally, include a `password` query parameter.
+
+**Using `curl`**:
+
+```bash
+curl "https://short-ly-cfl1.onrender.com/abc123/?password=yourpassword"
+```
+## Response
+- **original_url**: (https://github.com/kartikrathee95/URLShortener/blob/main/README.md)
+- **redirect_url**: (https://short-ly-cfl1.onrender.com/abc123)
+- **Redirects to original URL**
+
+### 3. **Set a Password for a Shortened URL**
+
+**POST**: `/shorten/`
+
+You can include the `password` parameter when creating a shortened URL to set a password for accessing the link.
+
+**Using `curl`**:
+
+```bash
+curl -X POST "https://short-ly-cfl1.onrender.com/shorten/" -H "Content-Type: application/json" -d '{"original_url": "https://github.com/kartikrathee95/URLShortener/blob/main/README.md", "password": "string"}'
+```
+## Response
+
+- **id**: 1
+- **original_url**: https://github.com/kartikrathee95/URLShortener/blob/main/README.md
+- **short_url**: https://short-ly-cfl1.onrender.com/abc123
+- **password**: string
+- **expiration_hours**: 30
+- **expiration_at**: 2025-01-21T16:20:04.562Z
+- **visits**: 0
+- **created_at**: 2025-01-20T16:20:04.562Z
+
+
+### 4. **Track Analytics (View Visits)**
+
+**GET**: `/analytics/{short_url}/`
+
+To track the analytics of a shortened URL, send a GET request to view the visit count and other details.
+
+**Using `curl`**:
+
+```bash
+curl "https://short-ly-cfl1.onrender.com/analytics/abc123/"
+```
+## Response
+
+  **id**: 1
+  **short_url**: https://short-ly-cfl1.onrender.com/abc123
+  **visits**: 10
+  **created_at**: 2025-01-20T12:34:56
+  **expiration_at**: 2025-01-21T16:20:04.562Z
+
+
 
 ## Installation
 
@@ -43,10 +140,14 @@ A simple URL shortening web application built using Django and Django REST Frame
 6. (Optional) Create a superuser to access the admin panel:
 
     python manage.py createsuperuser
-
-7. Run the development server:
+   
+8. Run Unit Tests
+    python manage.py test
+   
+10. Run the development server:
 
     python manage.py runserver
+
 
 You can now access the application by visiting http://127.0.0.1:8000 in your web browser.
 
