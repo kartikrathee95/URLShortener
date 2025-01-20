@@ -1,120 +1,163 @@
 # URL Shortener
 
-A simple URL shortening web application built using Django and Django REST Framework. This app allows users to shorten URLs, visit the shortened URL, and view analytics on the usage of each shortened link. Additionally, users can set a password for a shortened URL and view access logs.
+A simple URL shortening web application built using **Django** and **Django REST Framework**. This app allows users to shorten URLs, visit the shortened URL, and view analytics on the usage of each shortened link. Additionally, users can set a password for a shortened URL and view access logs.
 
 ## Features
 
-* Shorten URLs: Convert long URLs into short URLs.
-* Password protection: Set a password on shortened URLs for additional security.
-* Visit Shortened URLs: Redirect to the original URL when visiting a shortened URL.
-* Analytics: Track the number of times a shortened URL has been accessed and view access logs.
-* Error Handling: Handle invalid URLs and missing shortened URLs with appropriate error messages.
+- **Shorten URLs**: Convert long URLs into short URLs.
+- **Password protection**: Set a password on shortened URLs for additional security.
+- **Visit Shortened URLs**: Redirect to the original URL when visiting a shortened URL.
+- **Analytics**: Track the number of times a shortened URL has been accessed and view access logs.
+- **Error Handling**: Handle invalid URLs and missing shortened URLs with appropriate error messages.
 
 ## Requirements
 
-* Python 3.x
-* Django
-* Django REST Framework
-* SQLite (default database)
+- **Python 3.x**
+- **Django**
+- **Django REST Framework**
+- **SQLite** (default database)
 
-## Installation
+## Installation Guide
 
-1. Clone the repository:
+Follow these steps to set up and run the project on your local machine:
 
-   git clone https://github.com/yourusername/url-shortener.git
+1. **Clone the repository**:
 
-2. Navigate to the project directory:
+    ```bash
+    git clone https://github.com/yourusername/url-shortener.git
+    ```
 
-   cd url-shortener
+2. **Navigate to the project directory**:
 
-3. Create and activate a virtual environment (optional but recommended):
+    ```bash
+    cd url-shortener
+    ```
 
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+3. **Create and activate a virtual environment (optional but recommended)**:
 
-4. Install the required dependencies:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
 
-   pip install -r requirements.txt
+4. **Install the required dependencies**:
 
-5. Apply the migrations to set up the database:
-   python manage.py makemigrations
-   python manage.py migrate
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-6. (Optional) Create a superuser to access the admin panel:
+5. **Apply the migrations to set up the database**:
 
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+6. (Optional) **Create a superuser** to access the admin panel:
+
+    ```bash
     python manage.py createsuperuser
+    ```
 
-7. Run the development server:
+7. **Run the development server**:
 
+    ```bash
     python manage.py runserver
+    ```
 
-You can now access the application by visiting http://127.0.0.1:8000 in your web browser.
+You can now access the application by visiting [http://127.0.0.1:8000](http://127.0.0.1:8000) in your web browser.
 
-## Endpoints
+## API Endpoints
 
-### 1. Home Page
+### 1. **Home Page**
 
-* **URL**: `/`
-* **Method**: `GET`
-* **Description**: Displays the home page of the application.
+- **URL**: `/`
+- **Method**: `GET`
+- **Description**: Displays the home page of the application.
 
-### 2. Shorten URL
+### 2. **Shorten URL**
 
-* **URL**: `/shorten`
-* **Method**: `POST`
-* **Request Body (JSON)**:
+- **URL**: `/shorten`
+- **Method**: `POST`
+- **Request Body (JSON)**:
 
-    { "original_url": "https://example.com" }
+    ```json
+    {
+      "original_url": "https://example.com"
+    }
+    ```
 
-* **Response (Success)**:
+- **Response (Success)**:
 
-    { "short_url": "abcd1234" }
+    ```json
+    {
+      "short_url": "abcd1234"
+    }
+    ```
 
-* **Response (Failure)**:
+- **Response (Failure)**:
 
-    { "error": "Invalid URL" }
+    ```json
+    {
+      "error": "Invalid URL"
+    }
+    ```
 
-* **Description**: Takes an original URL and returns a shortened URL.
+- **Description**: Takes an original URL and returns a shortened URL.
 
-### 3. Visit Shortened URL
+### 3. **Visit Shortened URL**
 
-* **URL**: `/shorten/<short_url>/`
-* **Method**: `GET`
-* **Query Parameter**:
-    * `password`: The password for the shortened URL (optional).
-* **Response**: Redirects to the original URL if the password (if set) is correct, or returns an error if the password is incorrect or the URL is not found.
+- **URL**: `/shorten/<short_url>/`
+- **Method**: `GET`
+- **Query Parameter**:
+    - `password`: The password for the shortened URL (optional).
+- **Response**: Redirects to the original URL if the password (if set) is correct, or returns an error if the password is incorrect or the URL is not found.
 
-### 4. Analytics
+### 4. **Analytics**
 
-* **URL**: `/analytics/<short_url>/`
-* **Method**: `GET`
-* **Response**:
+- **URL**: `/analytics/<short_url>/`
+- **Method**: `GET`
+- **Response**:
 
-{
-  "original_url": "https://example.com",
-  "short_url": "abcd1234",
-  "access_count": 10,
-  "logs": [
-    { "ip_address": "192.168.0.1", "user_agent": "Mozilla/5.0" }
-  ]
-}
+    ```json
+    {
+      "original_url": "https://example.com",
+      "short_url": "abcd1234",
+      "access_count": 10,
+      "logs": [
+        { "ip_address": "192.168.0.1", "user_agent": "Mozilla/5.0" }
+      ]
+    }
+    ```
 
-* **Description**: Returns the analytics for a shortened URL, including access count and logs.
+- **Description**: Returns the analytics for a shortened URL, including access count and logs.
 
 ## Example Usage
 
 1. **Shorten a URL**: Send a `POST` request to `/shorten` with the original URL. Example:
 
-     curl -X POST http://127.0.0.1:8000/shorten -H "Content-Type: application/json" -d '{"original_url": "https://example.com"}'
+    ```bash
+    curl -X POST http://127.0.0.1:8000/shorten -H "Content-Type: application/json" -d '{"original_url": "https://example.com"}'
+    ```
 
-Response:
+    **Response**:
 
-     { "short_url": "abcd1234" }
+    ```json
+    {
+      "short_url": "abcd1234"
+    }
+    ```
 
 2. **Visit a Shortened URL**: Send a `GET` request to `/shorten/<short_url>/`. Example:
 
-     curl http://127.0.0.1:8000/shorten/abcd1234/
+    ```bash
+    curl http://127.0.0.1:8000/shorten/abcd1234/
+    ```
 
 3. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
 
-     curl http://127.0.0.1:8000/analytics/abcd1234/ 
+    ```bash
+    curl http://127.0.0.1:8000/analytics/abcd1234/
+    ```
+
+---
