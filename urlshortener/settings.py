@@ -31,9 +31,9 @@ ALLOWED_HOSTS = ["short.ly.onrender.com", "localhost", "127.0.0.1"]
 
 BASE_URL = None
 # Check if the environment is production, and use the correct .env value
-BASE_URL = ""
+BASE_URL = "http://localhost:8000"
 if os.getenv("DJANGO_ENV") == "production":
-    BASE_URL = "https://short.ly.onrender.com"
+    BASE_URL = "https://short-ly-cfl1.onrender.com"
 
     STATIC_URL = "/static/"
 
