@@ -70,7 +70,10 @@ class URLShortenerTests(TestCase):
             self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_analytics_success(self):
-        response = self.client.get(f"/analytics/{self.short_url}")
+        data = {"original_url": "https://test.com"}
+        response = self.client.post("/shorten", data, content_type="application/json")
+        short_url = response.json()["short_url"]
+        response = self.client.get(f"/analytics/{short_url}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_analytics_failure(self):

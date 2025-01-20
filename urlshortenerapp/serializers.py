@@ -24,7 +24,8 @@ class ShortenedURLSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["short_url", "created_at", "expiration_at", "visits"]
 
-    def validate_original_url(self, value):
+    @classmethod
+    def validate_url(cls, value):
         """
         Validate that the provided URL is well-formed.
         """
@@ -32,7 +33,7 @@ class ShortenedURLSerializer(serializers.ModelSerializer):
         try:
             validator(value)
         except ValidationError:
-            raise ValidationError("The original URL is not well-formed.")
+            raise ValidationError("The input URL is not well-formed.")
         return value
 
     def create(self, validated_data):

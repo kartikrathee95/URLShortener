@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.forms.models import model_to_dict
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
@@ -38,8 +39,10 @@ def shorten_url(request):
             serializer = ShortenedURLSerializer(data=request.data)
             if serializer.is_valid():
                 shortened_url = serializer.create(serializer.validated_data)
+                response = model_to_dict(shortened_url, exclude=["id", "password"])
+                response.update({"created_at": shortened_url.created_at})
                 return JsonResponse(
-                    {"short_url": shortened_url.short_url},
+                    response,
                     status=status.HTTP_201_CREATED,
                 )
 
@@ -91,6 +94,7 @@ def log_access_to_url(request, shortened_url):
 def visit_shortened_url(request, short_url):
     try:
         short_url = settings.BASE_URL + "/" + short_url
+        ShortenedURLSerializer.validate_url(short_url)
         shortened_url = get_object_or_404(ShortenedURL, short_url=short_url)
         if shortened_url.is_expired():
             return JsonResponse(
@@ -123,6 +127,10 @@ def visit_shortened_url(request, short_url):
         return JsonResponse(
             {"error": "Shortened URL not found"}, status=status.HTTP_404_NOT_FOUND
         )
+    except ValidationError as e:
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
     except Exception as e:
         return JsonResponse(
             {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -138,6 +146,7 @@ def visit_shortened_url(request, short_url):
 @api_view(["GET"])
 def analytics(request, short_url):
     try:
+        ShortenedURLSerializer.validate_url(short_url)
         shortened_url = get_object_or_404(ShortenedURL, short_url=short_url)
         # Gather analytics data
         access_logs = AccessLog.objects.filter(short_url=shortened_url)
@@ -158,6 +167,10 @@ def analytics(request, short_url):
     except Http404:
         return JsonResponse(
             {"error": "Shortened URL not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+    except ValidationError as e:
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     except Exception as e:
         return JsonResponse(
