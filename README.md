@@ -12,7 +12,7 @@ A simple URL shortening web application built using Django and Django REST Frame
 
 ## Requirements
 
-* Python 3.x
+* Python 3.10
 * Django
 * Django REST Framework
 * SQLite (default database)
@@ -21,11 +21,11 @@ A simple URL shortening web application built using Django and Django REST Frame
 
 1. Clone the repository:
 
-   git clone https://github.com/yourusername/url-shortener.git
+   git clone https://github.com/kartikrathee95/URLShortener.git
 
 2. Navigate to the project directory:
 
-   cd url-shortener
+   cd URLShortener
 
 3. Create and activate a virtual environment (optional but recommended):
 
@@ -52,11 +52,11 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 
 ## Endpoints
 
-### 1. Home Page
+### 1. Swagger UI
 
-* **URL**: `/`
+* **URL**: `/swagger`
 * **Method**: `GET`
-* **Description**: Displays the home page of the application.
+* **Description**: Make API requests using Swagger UI
 
 ### 2. Shorten URL
 
@@ -68,7 +68,7 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 
 * **Response (Success)**:
 
-    { "short_url": "abcd1234" }
+    { "short_url": "http://localhost:8000/abcd1234" (haslib implementation) }
 
 * **Response (Failure)**:
 
@@ -78,7 +78,7 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 
 ### 3. Visit Shortened URL
 
-* **URL**: `/shorten/<short_url>/`
+* **URL**: `/<short_url>/`
 * **Method**: `GET`
 * **Query Parameter**:
     * `password`: The password for the shortened URL (optional).
@@ -109,12 +109,12 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 
 Response:
 
-     { "short_url": "abcd1234" }
+     { "short_url": "http://localhost:8000/abcd1234" }
 
-2. **Visit a Shortened URL**: Send a `GET` request to `/shorten/<short_url>/`. Example:
+2. **Visit a Shortened URL**: Send a `GET` request to `/<short_url>/`. Example:
 
-     curl http://127.0.0.1:8000/shorten/abcd1234/
+     curl http://127.0.0.1:8000/abcd1234/
 
 3. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
 
-     curl http://127.0.0.1:8000/analytics/abcd1234/ 
+     curl http://127.0.0.1:8000/analytics/http://localhost:8000/abcd1234/ 
