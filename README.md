@@ -165,71 +165,67 @@ You can now access the application by visiting ```http://127.0.0.1:8000``` in yo
 ## Endpoints
 
 ### 1. Swagger UI
-
-* **URL**: `/swagger`
-* **Method**: `GET`
-* **Description**: Make API requests using Swagger UI
+- **URL**: `/swagger`
+- **Method**: `GET`
+- **Description**: Make API requests using Swagger UI
 
 ### 2. Shorten URL
-
-* **URL**: `/shorten`
-* **Method**: `POST`
-* **Request Body (JSON)**:
-    
-    ```bash{ "original_url": "https://example.com" }```
-
-* **Response (Success)**:
-
-    ```bash{ "short_url": "http://localhost:8000/abcd1234" (haslib implementation) }```
-
-* **Response (Failure)**:
-
-    ```bash{ "error": "Invalid URL" }```
-
-* **Description**: Takes an original URL and returns a shortened URL.
+- **URL**: `/shorten`
+- **Method**: `POST`
+- **Request Body (JSON)**:
+    ```json
+    { "original_url": "https://example.com" }
+    ```
+- **Response (Success)**:
+    ```json
+    { "short_url": "http://localhost:8000/abcd1234" }  (haslib implementation)
+    ```
+- **Response (Failure)**:
+    ```json
+    { "error": "Invalid URL" }
+    ```
+- **Description**: Takes an original URL and returns a shortened URL.
 
 ### 3. Visit Shortened URL
-
-* **URL**: `/<short_url>/`
-* **Method**: `GET`
-* **Query Parameter**:
-    * `password`: The password for the shortened URL (optional).
-* **Response**: Redirects to the original URL if the password (if set) is correct, or returns an error if the password is incorrect or the URL is not found.
+- **URL**: `/<short_url>/`
+- **Method**: `GET`
+- **Query Parameter**:
+    - `password`: The password for the shortened URL (optional).
+- **Response**: Redirects to the original URL if the password (if set) is correct, or returns an error if the password is incorrect or the URL is not found.
 
 ### 4. Analytics
-
-* **URL**: `/analytics/<short_url>/`
-* **Method**: `GET`
-* **Response**:
-
-{
-  "original_url": "https://example.com",
-  "short_url": "abcd1234",
-  "access_count": 10,
-  "logs": [
-    { "ip_address": "192.168.0.1", "user_agent": "Mozilla/5.0" }
-  ]
-}
-
-* **Description**: Returns the analytics for a shortened URL, including access count and logs.
+- **URL**: `/analytics/<short_url>/`
+- **Method**: `GET`
+- **Response**:
+    ```json
+    {
+      "original_url": "https://example.com",
+      "short_url": "abcd1234",
+      "access_count": 10,
+      "logs": [
+        { "ip_address": "192.168.0.1", "user_agent": "Mozilla/5.0" }
+      ]
+    }
+    ```
+- **Description**: Returns the analytics for a shortened URL, including access count and logs.
 
 ## Example Usage
 
 1. **Shorten a URL**: Send a `POST` request to `/shorten` with the original URL. Example:
-     ```bash
-     curl -X POST http://127.0.0.1:8000/shorten -H "Content-Type: application/json" -d '{"original_url": "https://example.com"}'
-     ```
-
-Response:
-
-     { "short_url": "http://localhost:8000/abcd1234" }
+    ```bash
+    curl -X POST http://127.0.0.1:8000/shorten -H "Content-Type: application/json" -d '{"original_url": "https://example.com"}'
+    ```
+    **Response**:
+    ```json
+    { "short_url": "http://localhost:8000/abcd1234" }
+    ```
 
 2. **Visit a Shortened URL**: Send a `GET` request to `/<short_url>/`. Example:
     ```bash
-     curl http://127.0.0.1:8000/abcd1234/
+    curl http://127.0.0.1:8000/abcd1234/
     ```
 
-4. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
+3. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
     ```bash
-     curl http://127.0.0.1:8000/analytics/http://localhost:8000/abcd1234/
+    curl http://127.0.0.1:8000/analytics/http://localhost:8000/abcd1234/
     ```
