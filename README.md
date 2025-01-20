@@ -43,7 +43,7 @@ To shorten a URL, send a POST request with the `original_url` parameter in the r
 **Using `curl`**:
 
 ```bash
-curl -X POST "https://short-ly-cfl1.onrender.com/api/shorten/" -H "Content-Type: application/json" -d '{"original_url": "https://github.com/kartikrathee95/URLShortener/blob/main/README.md"}'
+curl -X POST "https://short-ly-cfl1.onrender.com/shorten/" -H "Content-Type: application/json" -d '{"original_url": "https://github.com/kartikrathee95/URLShortener/blob/main/README.md"}'
 ```
 ## Response
 
