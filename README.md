@@ -21,32 +21,32 @@ A simple URL shortening web application built using Django and Django REST Frame
 
 1. Clone the repository:
 
-git clone https://github.com/yourusername/url-shortener.git
+   git clone https://github.com/yourusername/url-shortener.git
 
 2. Navigate to the project directory:
 
-cd url-shortener
+   cd url-shortener
 
 3. Create and activate a virtual environment (optional but recommended):
 
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 4. Install the required dependencies:
 
-pip install -r requirements.txt
+   pip install -r requirements.txt
 
 5. Apply the migrations to set up the database:
-
-python manage.py migrate
+   python manage.py makemigrations
+   python manage.py migrate
 
 6. (Optional) Create a superuser to access the admin panel:
 
-python manage.py createsuperuser
+    python manage.py createsuperuser
 
 7. Run the development server:
 
-python manage.py runserver
+    python manage.py runserver
 
 You can now access the application by visiting http://127.0.0.1:8000 in your web browser.
 
