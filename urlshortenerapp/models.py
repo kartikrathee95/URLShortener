@@ -1,11 +1,7 @@
-import hashlib
-import time
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
-from django.db import IntegrityError, models, transaction
+from django.db import models, transaction
 from django.db.models import F
 from django.utils import timezone
 
@@ -14,6 +10,7 @@ class ShortenedURL(models.Model):
     original_url = models.URLField(max_length=400)
     short_url = models.CharField(max_length=50, default="", unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    expiration_hours = models.IntegerField(default=24)
     expiration_at = models.DateTimeField(null=True, blank=True, default=None)
     visits = models.IntegerField(default=0)
     password = models.CharField(
@@ -21,15 +18,6 @@ class ShortenedURL(models.Model):
     )  # Optional password to access the URL
 
     def save(self, *args, **kwargs):
-        if not self.created_at:
-            self.created_at = timezone.now()
-
-        if not self.expiration_at:
-            # set the default expiration at to 24 hours from now
-            self.expiration_at = self.created_at + timedelta(hours=24)
-
-        if not self.short_url:
-            self.short_url = self.generate_short_url()
         existing_url = ShortenedURL.objects.filter(short_url=self.short_url).first()
         # Update operation
         if existing_url:
@@ -59,48 +47,14 @@ class ShortenedURL(models.Model):
         except cls.DoesNotExist:
             pass
 
-    # Function to generate a unique short URL, ensure requests are Idempotent
-    def generate_short_url(self):
-        """
-        Generate a unique short URL identifier (e.g., 'abc123').
-        """
-        if not self.original_url.startswith("http"):
-            raise ValidationError("The original URL must start with 'http' or 'https'.")
-
-        # Use SHA-256 to hash the URL
-        url_hash = hashlib.sha256(self.original_url.encode()).hexdigest()
-
-        short_url_id = url_hash[
-            :8
-        ]  # 8 characters: can be increased for more unique URLs
-
-        # Generate the full short URL
-        short_url = f"{settings.BASE_URL}/{short_url_id}"
-
-        return short_url
-
-    @classmethod
-    def validate_url(cls, url):
-        """
-        Validate that the provided URL is well-formed.
-        """
-        validator = URLValidator()
-        try:
-            validator(url)
-        except ValidationError:
-            raise ValidationError("The original URL is not well-formed.")
-
     def update_visits(self):
-
-        print(
-            f"Updating visits for {self.short_url}"
-        )  # Add this line to see when it's called
-        self.refresh_from_db()
+        """Increment the visit count for the shortened URL."""
         self.visits = F("visits") + 1
         with transaction.atomic():
             super().save(update_fields=["visits"])
 
     def is_expired(self):
+        """Check if the shortened URL has expired."""
         return timezone.now() > self.expiration_at
 
     def __str__(self):
