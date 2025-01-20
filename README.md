@@ -54,6 +54,7 @@ curl -X POST "https://short-ly-cfl1.onrender.com/api/shorten/" -H "Content-Type:
 - **visits**: 0
 - **created_at**: 2025-01-20T16:20.04.562Z
 
+
 ### 2. **Visit a Shortened URL**
 
 **GET**: `/{short_url}/`
@@ -83,7 +84,6 @@ curl -X POST "https://short-ly-cfl1.onrender.com/shorten/" -H "Content-Type: app
 ```
 ## Response
 
-- **id**: 1
 - **original_url**: https://github.com/kartikrathee95/URLShortener/blob/main/README.md
 - **short_url**: https://short-ly-cfl1.onrender.com/abc123
 - **password**: string
@@ -106,50 +106,61 @@ curl "https://short-ly-cfl1.onrender.com/analytics/abc123/"
 ```
 ## Response
 
-  **id**: 1
-  **short_url**: https://short-ly-cfl1.onrender.com/abc123
-  **visits**: 10
-  **created_at**: 2025-01-20T12:34:56
-  **expiration_at**: 2025-01-21T16:20:04.562Z
+- **Short URL**: [https://short-ly-cfl1.onrender.com/1004cc54](https://short-ly-cfl1.onrender.com/1004cc54)
+- **Original URL**: [https://github.com/kartikrathee95/URLShortener/edit/main/README.md](https://github.com/kartikrathee95/URLShortener/edit/main/README.md)
+- **Number of Visits**: 10
+### Logs
+- **IP Address**: 127.0.0.1  
+  **Accessed At**: 2025-01-20T11:28:07.644Z
 
 
 
 ## Installation
 
 1. Clone the repository:
-
+   ```bash
    git clone https://github.com/kartikrathee95/URLShortener.git
+   ```
 
 2. Navigate to the project directory:
-
+   ```bash
    cd URLShortener
+   ```
 
-3. Create and activate a virtual environment (optional but recommended):
-
+4. Create and activate a virtual environment (optional but recommended):
+   ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-4. Install the required dependencies:
-
+5. Install the required dependencies:
+   ```bash
    pip install -r requirements.txt
+   ```
 
-5. Apply the migrations to set up the database:
+6. Apply the migrations to set up the database:
+   ```bash
    python manage.py makemigrations
    python manage.py migrate
+   ```
 
-6. (Optional) Create a superuser to access the admin panel:
-
+7. (Optional) Create a superuser to access the admin panel:
+    ```bash
     python manage.py createsuperuser
+    ```
    
 8. Run Unit Tests
+   ```bash
     python manage.py test
+   ```
    
 10. Run the development server:
-
+    ```bash
     python manage.py runserver
+    ```
 
 
-You can now access the application by visiting http://127.0.0.1:8000 in your web browser.
+You can now access the application by visiting ```http://127.0.0.1:8000``` in your web browser.
 
 ## Endpoints
 
@@ -164,16 +175,16 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 * **URL**: `/shorten`
 * **Method**: `POST`
 * **Request Body (JSON)**:
-
-    { "original_url": "https://example.com" }
+    
+    ```bash{ "original_url": "https://example.com" }```
 
 * **Response (Success)**:
 
-    { "short_url": "http://localhost:8000/abcd1234" (haslib implementation) }
+    ```bash{ "short_url": "http://localhost:8000/abcd1234" (haslib implementation) }```
 
 * **Response (Failure)**:
 
-    { "error": "Invalid URL" }
+    ```bash{ "error": "Invalid URL" }```
 
 * **Description**: Takes an original URL and returns a shortened URL.
 
@@ -205,17 +216,20 @@ You can now access the application by visiting http://127.0.0.1:8000 in your web
 ## Example Usage
 
 1. **Shorten a URL**: Send a `POST` request to `/shorten` with the original URL. Example:
-
+     ```bash
      curl -X POST http://127.0.0.1:8000/shorten -H "Content-Type: application/json" -d '{"original_url": "https://example.com"}'
+     ```
 
 Response:
 
      { "short_url": "http://localhost:8000/abcd1234" }
 
 2. **Visit a Shortened URL**: Send a `GET` request to `/<short_url>/`. Example:
-
+    ```bash
      curl http://127.0.0.1:8000/abcd1234/
+    ```
 
-3. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
-
-     curl http://127.0.0.1:8000/analytics/http://localhost:8000/abcd1234/ 
+4. **View Analytics for a Shortened URL**: Send a `GET` request to `/analytics/<short_url>/`. Example:
+    ```bash
+     curl http://127.0.0.1:8000/analytics/http://localhost:8000/abcd1234/
+    ```
