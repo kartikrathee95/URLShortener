@@ -7,10 +7,9 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.shortcuts import redirect
 
 from .models import AccessLog, ShortenedURL
-from .serializers import AccessLogSerializer, ShortenedURLSerializer
+from .serializers import ShortenedURLSerializer
 
 
 @swagger_auto_schema(method="GET", responses={200: "OK"})
@@ -39,16 +38,24 @@ def shorten_url(request):
             serializer = ShortenedURLSerializer(data=request.data)
             if serializer.is_valid():
                 shortened_url = serializer.create(serializer.validated_data)
-                return JsonResponse({"short_url": shortened_url.short_url},
-                status=status.HTTP_201_CREATED,)
-        
-        else:
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse(
+                    {"short_url": shortened_url.short_url},
+                    status=status.HTTP_201_CREATED,
+                )
+
+            else:
+                return JsonResponse(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                )
 
     except ValidationError as e:
-        return JsonResponse({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 # Function to redirect to the original URL)
@@ -71,18 +78,24 @@ def log_access_to_url(request, shortened_url):
 # GET request to visit the shortened URL
 @csrf_exempt
 @swagger_auto_schema(
-    method="GET", responses={200: "Success", 301: "Redirect", 302: "Redirect", 404: "Not Found", 403: "Forbidden"}
+    method="GET",
+    responses={
+        200: "Success",
+        301: "Redirect",
+        302: "Redirect",
+        404: "Not Found",
+        403: "Forbidden",
+    },
 )
 @api_view(["GET"])
 def visit_shortened_url(request, short_url):
-    print(request.headers)
     try:
         short_url = settings.BASE_URL + "/" + short_url
         shortened_url = get_object_or_404(ShortenedURL, short_url=short_url)
         if shortened_url.is_expired():
             return JsonResponse(
                 {"error": "This URL has expired, Please create a new shortened URL"},
-                status=404,
+                status=status.HTTP_403_FORBIDDEN,
             )
         # If the URL has a password, check if the user has provided the correct password
         if shortened_url.password:
@@ -99,15 +112,21 @@ def visit_shortened_url(request, short_url):
         if "swagger" in user_agent:
             # Return the URL in the response instead of performing the redirect
             return JsonResponse(
-                {"short_url": shortened_url.short_url,
-                "redirect_to": shortened_url.original_url},
-                status=200
+                {
+                    "short_url": shortened_url.short_url,
+                    "redirect_to": shortened_url.original_url,
+                },
+                status=status.HTTP_200_OK,
             )
         return HttpResponseRedirect(shortened_url.original_url)
     except Http404:
-        return render(request, "404.html", {"message": "Shortened URL not found"})
+        return JsonResponse(
+            {"error": "Shortened URL not found"}, status=status.HTTP_404_NOT_FOUND
+        )
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 # GET request to view the analytics of the shortened URL
@@ -134,9 +153,13 @@ def analytics(request, short_url):
                 "access_count": shortened_url.visits,
                 "logs": logs,
             },
-            status=200,
+            status=status.HTTP_200_OK,
         )
     except Http404:
-        return render(request, "404.html", {"message": "Shortened URL not found"})
+        return JsonResponse(
+            {"error": "Shortened URL not found"}, status=status.HTTP_404_NOT_FOUND
+        )
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse(
+            {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

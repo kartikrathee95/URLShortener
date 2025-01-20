@@ -1,10 +1,10 @@
 import hashlib
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils import timezone
-from datetime import timedelta
 from rest_framework import serializers
 
 from .models import AccessLog, ShortenedURL
@@ -34,24 +34,28 @@ class ShortenedURLSerializer(serializers.ModelSerializer):
         except ValidationError:
             raise ValidationError("The original URL is not well-formed.")
         return value
-    
+
     def create(self, validated_data):
         """
         Override the create method to handle the `created_at`, `expiration_at`,
         and `short_url` fields manually and call the model's save method.
         """
-        if not validated_data.get('created_at'):
-            validated_data['created_at'] = timezone.now()
+        if not validated_data.get("created_at"):
+            validated_data["created_at"] = timezone.now()
 
-        expiration_hours = validated_data.get('expiration_hours', 24)
-        expiration_at = validated_data.get('expiration_at')
+        expiration_hours = validated_data.get("expiration_hours", 24)
+        expiration_at = validated_data.get("expiration_at")
         if not expiration_at:
-            expiration_at = validated_data['created_at'] + timedelta(hours=expiration_hours)
-        validated_data['expiration_at'] = expiration_at
+            expiration_at = validated_data["created_at"] + timedelta(
+                hours=expiration_hours
+            )
+        validated_data["expiration_at"] = expiration_at
 
         # Generate the short URL
-        if not validated_data.get('short_url'):
-            validated_data['short_url'] = self.generate_short_url(validated_data['original_url'])
+        if not validated_data.get("short_url"):
+            validated_data["short_url"] = self.generate_short_url(
+                validated_data["original_url"]
+            )
 
         # call save method of model
         instance = ShortenedURL(**validated_data)

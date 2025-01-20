@@ -1,10 +1,9 @@
-from django.test import TestCase
-
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from django.conf import settings
-from .models import ShortenedURL, AccessLog
+
+from .models import AccessLog, ShortenedURL
 from .serializers import ShortenedURLSerializer
 
 
@@ -14,7 +13,9 @@ class URLShortenerTests(TestCase):
         # Setup a sample shortened URL for testing
         self.original_url = "https://example.com"
         self.short_url = "abcd1234"  # Assuming we are using the short URL directly
-        self.shortened_url = ShortenedURL.objects.create(original_url=self.original_url, short_url=self.short_url)
+        self.shortened_url = ShortenedURL.objects.create(
+            original_url=self.original_url, short_url=self.short_url
+        )
 
     def test_home_page(self):
         response = self.client.get("/")
@@ -32,14 +33,13 @@ class URLShortenerTests(TestCase):
         response = self.client.post("/shorten", data, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
     def test_visit_shortened_url_redirect_success(self):
         data = {"original_url": "https://test.com"}
         response = self.client.post("/shorten", data, content_type="application/json")
         short_url = response.json()["short_url"].split("/")[-1]
         response = self.client.get(f"/{short_url}")
         self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
-    
+
     def test_visit_shortened_url_not_found(self):
         response = None
         try:
@@ -63,7 +63,9 @@ class URLShortenerTests(TestCase):
             self.shortened_url.password = password
             self.shortened_url.save()
 
-            response = self.client.get(f"/{self.short_url}", {"password": "wrong_password"})
+            response = self.client.get(
+                f"/{self.short_url}", {"password": "wrong_password"}
+            )
         except:
             self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -77,4 +79,3 @@ class URLShortenerTests(TestCase):
             response = self.client.get(f"/analytics/nonexistenturl")
         except:
             self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
