@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-!@-y01p3@^6q@+_#y3m0-1(gf%btt87&28aegsze9o_!iw3if0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["short.ly.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["short-ly-cfl1.onrender.com", "localhost", "127.0.0.1"]
 
 
 BASE_URL = None
