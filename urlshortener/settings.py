@@ -31,9 +31,19 @@ ALLOWED_HOSTS = ["short.ly.onrender.com", "localhost", "127.0.0.1"]
 
 BASE_URL = None
 # Check if the environment is production, and use the correct .env value
-BASE_URL = "http://localhost:8000"
-if os.getenv("DJANGO_ENV") == "development":
+BASE_URL = ""
+if os.getenv("DJANGO_ENV") == "production":
     BASE_URL = "https://short.ly.onrender.com"
+
+    STATIC_URL = '/static/'
+
+# The directory where static files will be collected
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optionally, add the directories where static files are stored
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     "urlshortenerapp",
@@ -57,6 +67,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = "urlshortener.urls"
