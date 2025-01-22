@@ -65,6 +65,7 @@ class ShortenedURLSerializer(serializers.ModelSerializer):
 
             return instance
         except Exception as e:
+            print(str(e))
             raise Exception("Error creating the shortened URL")
 
     def generate_short_url(self, original_url):

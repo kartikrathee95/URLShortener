@@ -25,12 +25,13 @@ class ShortenedURL(models.Model):
                 updated_fields = {}
                 for field in self._meta.fields:
                     field_name = field.name
-                    if field_name not in ("created_at","short_url","id"):
+                    if field_name == "visits":
+                        updated_fields[field_name] = getattr(existing_url, field_name)
+                    elif field_name not in ("created_at","short_url","id"):
                         new_value = getattr(self, field_name)
                         updated_fields[field_name] = new_value
                 if "password" not in updated_fields:
                     updated_fields["password"] = None
-               
                 # Update the fields in the database using the short_url to find the existing record
                 existing_url.__class__.objects.filter(
                     short_url=existing_url.short_url
@@ -56,6 +57,7 @@ class ShortenedURL(models.Model):
     def update_visits(self):
         """Increment the visit count for the shortened URL."""
         self.visits = F("visits") + 1
+        print(self.visits)
         with transaction.atomic():
             super().save(update_fields=["visits"])
 

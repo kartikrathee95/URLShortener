@@ -1,3 +1,4 @@
+import urllib
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import model_to_dict
@@ -93,7 +94,9 @@ def log_access_to_url(request, shortened_url):
 @api_view(["GET"])
 def visit_shortened_url(request, short_url):
     try:
-        short_url = settings.BASE_URL + "/" + short_url
+     
+        short_url = urllib.parse(settings.BASE_URL + "/" + short_url)
+        print(short_url)
         ShortenedURLSerializer.validate_url(short_url)
         shortened_url = get_object_or_404(ShortenedURL, short_url=short_url)
         if shortened_url.is_expired():
