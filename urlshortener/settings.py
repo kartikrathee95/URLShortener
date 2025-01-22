@@ -37,13 +37,12 @@ if os.getenv("DJANGO_ENV") == "production":
 
     STATIC_URL = "/static/"
 
-# The directory where static files will be collected
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# Optionally, add the directories where static files are stored
+# add the directories where static files are stored
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.abspath(os.path.join(BASE_DIR, "staticfiles")),
 ]
+
 CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     "urlshortenerapp",
