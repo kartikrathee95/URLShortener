@@ -1,16 +1,16 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.db import models, transaction
+from django.core.validators import MaxValueValidator
 from django.db.models import F
 from django.utils import timezone
-
+from django.db import models, transaction
 
 class ShortenedURL(models.Model):
     original_url = models.URLField(max_length=400)
     short_url = models.CharField(max_length=50, default="", unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expiration_hours = models.IntegerField(default=24)
+    expiration_hours = models.IntegerField(default=24,validators=[MaxValueValidator(10**7)] )
     expiration_at = models.DateTimeField(null=True, blank=True, default=None)
     visits = models.IntegerField(default=0)
     password = models.CharField(
@@ -18,24 +18,30 @@ class ShortenedURL(models.Model):
     )  # Optional password to access the URL
 
     def save(self, *args, **kwargs):
-        existing_url = ShortenedURL.objects.filter(short_url=self.short_url).first()
-        # Update operation
-        if existing_url:
-            updated_fields = {}
-            for field in self._meta.fields:
-                field_name = field.name
-                if field_name != "created_at" and field_name != "short_url":
-                    new_value = getattr(existing_url, field_name)
-                    updated_fields[field_name] = new_value
+        try:
+            existing_url = ShortenedURL.objects.filter(short_url=self.short_url).first()
+            # Update operation
+            if existing_url:
+                updated_fields = {}
+                for field in self._meta.fields:
+                    field_name = field.name
+                    if field_name not in ("created_at","short_url","id"):
+                        new_value = getattr(self, field_name)
+                        updated_fields[field_name] = new_value
+                if "password" not in updated_fields:
+                    updated_fields["password"] = None
+               
+                # Update the fields in the database using the short_url to find the existing record
+                existing_url.__class__.objects.filter(
+                    short_url=existing_url.short_url
+                ).update(**updated_fields)
 
-            # Update the fields in the database using the short_url to find the existing record
-            existing_url.__class__.objects.filter(
-                short_url=existing_url.short_url
-            ).update(**updated_fields)
-
-        else:
-            # Create operation
-            super().save(*args, **kwargs)
+            else:
+                # Create operation
+                super().save(*args, **kwargs)
+        except Exception as e:
+            print(str(e))
+            raise Exception("Error saving the shortened URL")
 
     # Delete operation
     @classmethod

@@ -41,28 +41,31 @@ class ShortenedURLSerializer(serializers.ModelSerializer):
         Override the create method to handle the `created_at`, `expiration_at`,
         and `short_url` fields manually and call the model's save method.
         """
-        if not validated_data.get("created_at"):
-            validated_data["created_at"] = timezone.now()
+        try:
+            if not validated_data.get("created_at"):
+                validated_data["created_at"] = timezone.now()
 
-        expiration_hours = validated_data.get("expiration_hours", 24)
-        expiration_at = validated_data.get("expiration_at")
-        if not expiration_at:
-            expiration_at = validated_data["created_at"] + timedelta(
-                hours=expiration_hours
-            )
-        validated_data["expiration_at"] = expiration_at
+            expiration_hours = validated_data.get("expiration_hours", 24)
+            expiration_at = validated_data.get("expiration_at")
+            if not expiration_at:
+                expiration_at = validated_data["created_at"] + timedelta(
+                    hours=expiration_hours
+                )
+            validated_data["expiration_at"] = expiration_at
 
-        # Generate the short URL
-        if not validated_data.get("short_url"):
-            validated_data["short_url"] = self.generate_short_url(
-                validated_data["original_url"]
-            )
+            # Generate the short URL
+            if not validated_data.get("short_url"):
+                validated_data["short_url"] = self.generate_short_url(
+                    validated_data["original_url"]
+                )
 
-        # call save method of model
-        instance = ShortenedURL(**validated_data)
-        instance.save()
+            # call save method of model
+            instance = ShortenedURL(**validated_data)
+            instance.save()
 
-        return instance
+            return instance
+        except Exception as e:
+            raise Exception("Error creating the shortened URL")
 
     def generate_short_url(self, original_url):
         """
